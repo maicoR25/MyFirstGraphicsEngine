@@ -74,6 +74,7 @@ int main() {
 	Shader rainbowShader("shaders/simpleVertexShader.vert", "shaders/purpleFragmentShader.frag");
 	while (!glfwWindowShouldClose(window)) {
 		rainbowShader.use();
+
 	//	/*float timeValue = glfwGetTime();
 	//	float greenValue = sin(timeValue) / 2.0f + 0.5f;
 	//	int vertexColorLocation = glGetUniformLocation(squareShaderProgram, "ourColor");*/
