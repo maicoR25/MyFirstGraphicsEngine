@@ -36,7 +36,7 @@ int main() {
 		// Positions		// Colors
 		 0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
 		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+		-0.5f, -0.5f, 0.1f, 0.0f, 0.0f, 1.0f
 		//-0.5f,  0.5f, 0.0f, 0.5f, 0.5f, 0.5f
 	};
 
@@ -71,14 +71,13 @@ int main() {
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
-	Shader rainbowShader("shaders/simpleVertexShader.vert", "shaders/purpleFragmentShader.frag");
+	Shader rainbowShader("shaders/simpleVertexShader.vert", "shaders/simpleFragmentShader.frag");
 	while (!glfwWindowShouldClose(window)) {
 		rainbowShader.use();
 
-	//	/*float timeValue = glfwGetTime();
-	//	float greenValue = sin(timeValue) / 2.0f + 0.5f;
-	//	int vertexColorLocation = glGetUniformLocation(squareShaderProgram, "ourColor");*/
-	//	glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+		float timeValue = glfwGetTime();
+		float changeValue = (sin(timeValue) / 2.0f);
+		rainbowShader.setFloat("horizontalOffset", changeValue);
 
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
