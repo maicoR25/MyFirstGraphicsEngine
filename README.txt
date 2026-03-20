@@ -1,0 +1,3 @@
+Thank you for checking out my github repo! As the title of the repo/project says, this is my attempt at making a graphics engine from scratch. I'm following the book over at learnopengl.com for the graphics stuff, and the book learncpp.com for learning c++. 
+
+I started the project around March 7th, and s of writing this readme, it is currently March 20th, 2026. I started this project because graphics programming has always been an interest of mine and because I think c++ is really neat language. Before starting, I knew nothing of the language, but luckily, most of the concepts from Java/other languages carry over. If you spot any mistakes or areas I could improve, feel free to reach out via email at michael.rangel0709@gmail.com.
