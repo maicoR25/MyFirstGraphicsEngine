@@ -71,13 +71,13 @@ int main() {
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
-	Shader rainbowShader("shaders/simpleVertexShader.vert", "shaders/simpleFragmentShader.frag");
+	Shader rainbowShader("assets/shaders/simpleVertexShader.vert", "assets/shaders/simpleFragmentShader.frag");
 	while (!glfwWindowShouldClose(window)) {
 		rainbowShader.use();
 
 		float timeValue = glfwGetTime();
 		float changeValue = (sin(timeValue) / 2.0f);
-		rainbowShader.setFloat("horizontalOffset", changeValue);
+		//rainbowShader.setFloat("horizontalOffset", changeValue);
 
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
