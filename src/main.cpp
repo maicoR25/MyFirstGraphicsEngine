@@ -80,32 +80,45 @@ int main() {
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	stbi_set_flip_vertically_on_load(true);
 	Shader epicShader("assets/shaders/simpleVertexShader.vert", "assets/shaders/simpleFragmentShader.frag");
+	unsigned int transformLoc = glGetUniformLocation(epicShader.ID, "transform");
 	int width, height, nrChannels;
-	unsigned char* data = stbi_load("assets/textures/epicImage.jpg", &width, &height, &nrChannels, 0);
+	unsigned char* data = stbi_load("assets/textures/container.jpg", &width, &height, &nrChannels, 0);
 
 	unsigned int texture1, texture2;
-	glGenTextures(2, &texture1);
+	glGenTextures(1, &texture1);
 	glBindTexture(GL_TEXTURE_2D, texture1);
 
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	
-	glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-	glm::mat4 trans = glm::mat4(1.0f);
-	trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-	vec = trans * vec;
-	std::cout << vec.x << vec.y << vec.z << std::endl;
-
+	
 	stbi_image_free(data);
 	while (!glfwWindowShouldClose(window)) {
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
 		epicShader.use();
 
 		float timeValue = glfwGetTime();
-		float changeValue = (sin(timeValue) / 2.0f);
+		//float changeValue = (sin(timeValue) / 2.0f);
 		//rainbowShader.setFloat("horizontalOffset", changeValue);
+		glm::mat4 trans = glm::mat4(1.0f);
+		trans = glm::rotate(trans, timeValue, glm::vec3(0.0f, 0.0f, 1.0f));
+
+		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
 		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		trans = glm::mat4(1.0f);
+		trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
+		float scale = sin(timeValue);
+		trans = glm::scale(trans, glm::vec3(scale, scale, scale));
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
+		
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		//drawTriangle();
 		//glBindVertexArray(0);
