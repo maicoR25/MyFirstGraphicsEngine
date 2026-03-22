@@ -1,7 +1,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include "headers\shader.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include "headers/shader.h"
+#include "headers/stb_image.h"
+
 
 
 
@@ -33,18 +38,18 @@ int main() {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	float vertices[] = {
-		// Positions		// Colors
-		 0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-		-0.5f, -0.5f, 0.1f, 0.0f, 0.0f, 1.0f
-		//-0.5f,  0.5f, 0.0f, 0.5f, 0.5f, 0.5f
+		// Positions		// Colors		  // Texture Coords
+		 0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+		-0.5f, -0.5f, 0.1f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		-0.5f,  0.5f, 0.0f, 0.5f, 0.5f, 0.5f, 0.0f, 1.0f
 	};
 
 	unsigned int indices[] = {
 		0, 1, 3,
 		1, 2, 3,
 		0, 1, 4,
-		2, 3, 5
+		//2, 3, 5
 	};
 
 
@@ -63,24 +68,45 @@ int main() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	stbi_set_flip_vertically_on_load(true);
+	Shader epicShader("assets/shaders/simpleVertexShader.vert", "assets/shaders/simpleFragmentShader.frag");
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("assets/textures/epicImage.jpg", &width, &height, &nrChannels, 0);
+
+	unsigned int texture1, texture2;
+	glGenTextures(2, &texture1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
 	
-	Shader rainbowShader("assets/shaders/simpleVertexShader.vert", "assets/shaders/simpleFragmentShader.frag");
+	glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+	glm::mat4 trans = glm::mat4(1.0f);
+	trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+	vec = trans * vec;
+	std::cout << vec.x << vec.y << vec.z << std::endl;
+
+	stbi_image_free(data);
 	while (!glfwWindowShouldClose(window)) {
-		rainbowShader.use();
+		epicShader.use();
 
 		float timeValue = glfwGetTime();
 		float changeValue = (sin(timeValue) / 2.0f);
 		//rainbowShader.setFloat("horizontalOffset", changeValue);
 
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		//drawTriangle();
 		//glBindVertexArray(0);
 
