@@ -137,6 +137,7 @@
   <ItemGroup>
     <ClInclude Include="headers\shader.h" />
     <ClInclude Include="headers\stb_image.h" />
+    <ClInclude Include="src\headers\camera.h" />
     <ClInclude Include="src\headers\shader.h" />
     <ClInclude Include="src\headers\stb_image.h" />
   </ItemGroup>

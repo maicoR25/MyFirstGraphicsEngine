@@ -8,7 +8,6 @@ out vec3 position;
 out vec2 TexCoord;
 
 uniform float horizontalOffset;
-//uniform mat4 transform;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;

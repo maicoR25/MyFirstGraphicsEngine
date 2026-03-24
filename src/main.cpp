@@ -6,21 +6,38 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "headers/shader.h"
 #include "headers/stb_image.h"
+#include "headers/camera.h"
 
 
 
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void processInput(GLFWwindow* window);
+void mouse_callBack(GLFWwindow* window, double xpos, double ypos);
+void scroll_callBack(GLFWwindow* window, double xOffSet, double yOffSet);
 
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+float lastX;
+float lastY;
+float fov = 45;
+bool firstMouse = true;
+Camera camera;
 
 int main() {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	
 
 	GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callBack);
+	glfwSetScrollCallback(window, scroll_callBack);
+
 	if (window == NULL) {
 		std::cout << "Failed to create GLFW Window" << std::endl;
 		glfwTerminate();
@@ -140,7 +157,7 @@ int main() {
 	stbi_image_free(data);
 
 	glm::vec3 cubePositions[] = {
-		glm::vec3(0.0f,  0.0f,  -5.0f),
+		glm::vec3(0.0f,  0.0f,  0.0f),
 		glm::vec3(2.0f,  5.0f, -15.0f),
 		glm::vec3(-1.5f, -2.2f, -2.5f),
 		glm::vec3(-3.8f, -2.0f, -12.3f),
@@ -151,27 +168,27 @@ int main() {
 		glm::vec3(1.5f,  0.2f, -1.5f),
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
+
 	while (!glfwWindowShouldClose(window)) {
+		processInput(window);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
 		epicShader.use();
-
-		float timeValue = glfwGetTime();
-
+		std::cout << std::string("FPS: ") << 1 / deltaTime << std::endl;
 
 		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		view = camera.getViewMatrix();
+		
 
 		glm::mat4 projection = glm::mat4(1.0f);
-		projection = glm::perspective(glm::radians(70.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
 
-		unsigned int modelLoc = glGetUniformLocation(epicShader.ID, "model");
-		unsigned int viewLoc = glGetUniformLocation(epicShader.ID, "view");
-		unsigned int projectionLoc = glGetUniformLocation(epicShader.ID, "projection");
 
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
-		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+		epicShader.setMat4("view", view);
+		epicShader.setMat4("projection", projection);
 
 		glBindVertexArray(VAO);
 	
@@ -182,10 +199,10 @@ int main() {
 			float angle = 20.0f * i;
 			if (i % 3 == 0) {
 				 angle = 20.0f * i + 50.0f;
-				 model = glm::rotate(model, timeValue * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+				 //model = glm::rotate(model, timeValue * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 			}
 
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+			epicShader.setMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 		glfwSwapBuffers(window);
@@ -198,4 +215,42 @@ int main() {
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow* window) {
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camera.processInput(FORWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camera.processInput(BACKWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		camera.processInput(LEFT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camera.processInput(RIGHT, deltaTime);
+	
+}
+
+void mouse_callBack(GLFWwindow* window, double xpos, double ypos) {
+	std::cout << xpos << ", " << ypos << std::endl;
+	if (firstMouse) {
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+	float xOffset = xpos - lastX;
+	float yOffset = lastY - ypos;
+	lastX = xpos;
+	lastY = ypos;
+	camera.processMouseInput(xOffset, yOffset);
+}
+
+void scroll_callBack(GLFWwindow* window, double xOffSet, double yOffSet) {
+	fov -= (float)yOffSet;
+	if (fov < 1.0f) {
+		fov = 1.0f;
+	} 
+	if (fov > 45.0f) {
+		fov = 45.0f;
+	}
 }
