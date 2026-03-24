@@ -142,6 +142,7 @@
     <ClInclude Include="src\headers\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\shaders\cubeVertexShader.vert" />
     <None Include="assets\shaders\purpleFragmentShader.frag" />
     <None Include="assets\shaders\simpleFragmentShader.frag" />
     <None Include="assets\shaders\simpleVertexShader.vert" />
