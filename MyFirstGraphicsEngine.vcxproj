@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\Miko\Documents\Repos\ReykSho\MyFirstGraphicsEngine\external\includes;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Miko\Documents\Repos\ReykSho\MyFirstGraphicsEngine\external\libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)external\includes;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)external\libs;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\$(ShortProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
