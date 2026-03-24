@@ -9,6 +9,8 @@ enum Camera_Movement {
 	BACKWARD,
 	LEFT,
 	RIGHT,
+	UP, 
+	DOWN
 };
 
 
@@ -35,7 +37,6 @@ public:
 	}
 
 	
-
 	void processInput(Camera_Movement direction, float deltaTime) {
 		float cameraSpeed = speed * deltaTime;
 		if (direction == FORWARD)
@@ -46,6 +47,11 @@ public:
 			Position += Right * cameraSpeed;
 		if (direction == LEFT)
 			Position -= Right * cameraSpeed;
+		if (direction == UP)
+			Position += Up * cameraSpeed;
+		if (direction == DOWN)
+			Position -= Up * cameraSpeed;
+
 		//if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 		//	speed += 0.05;
 		//if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && cameraSpeed - 0.05 >= 0)
@@ -73,6 +79,8 @@ public:
 		}
 		updateCameraVectors();
 	}
+
+
 private:
 	void updateCameraVectors() {
 		glm::vec3 Direction;

@@ -10,7 +10,8 @@
 
 
 
-
+const int INITAIL_WINDOW_WIDTH = 800;
+const int INITAIL_WINDOW_HEIGHT = 600;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -19,7 +20,8 @@ void scroll_callBack(GLFWwindow* window, double xOffSet, double yOffSet);
 void drawCube();
 void drawTriangle();
 
-
+int windowWidth = INITAIL_WINDOW_WIDTH;
+int windowHeight = INITAIL_WINDOW_HEIGHT;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 float lastX;
@@ -35,7 +37,7 @@ int main() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(INITAIL_WINDOW_WIDTH, INITAIL_WINDOW_HEIGHT, "LearnOpenGL", NULL, NULL);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callBack);
 	glfwSetScrollCallback(window, scroll_callBack);
@@ -118,6 +120,7 @@ int main() {
 		processInput(window);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glfwGetWindowSize(window, &windowWidth, &windowHeight);
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -127,9 +130,9 @@ int main() {
 		glm::mat4 view = glm::mat4(1.0f);
 		view = camera.getViewMatrix();
 		
-
+		
 		glm::mat4 projection = glm::mat4(1.0f);
-		projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(fov), ((float)windowWidth / windowHeight), 0.1f, 100.0f);
 
 
 		epicShader.setMat4("view", view);
@@ -137,19 +140,21 @@ int main() {
 
 		glBindVertexArray(VAO);
 	
-		for (unsigned int i = 0; i < 10; i++) {
-			glm::mat4 model = glm::mat4(1.0f);
-			
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			if (i % 3 == 0) {
-				 angle = 20.0f * i + 50.0f;
-				 //model = glm::rotate(model, timeValue * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+		for (unsigned int x = 0; x < 16; x++) {
+			for (unsigned int y = 0; y < 64; y++) {
+				for (unsigned int z = 0; z < 16; z++) {
+					glm::mat4 model = glm::mat4(1.0f);
+
+					model = glm::translate(model, glm::vec3(x, y, z));
+					model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+					model = glm::rotate(model, (float)glm::radians(glfwGetTime()), glm::vec3(x, y, z));
+
+					epicShader.setMat4("model", model);
+					drawCube();
+				}
 			}
 
-			epicShader.setMat4("model", model);
-			drawCube();
-			drawTriangle();
+			//drawTriangle();
 		}
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -165,47 +170,47 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void drawCube() {
 	float cubeVertices[] = {
 		// Positions		  // Texture coords
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		-0.25f, -0.25f, -0.25f,  0.0f, 0.0f,
+		 0.25f, -0.25f, -0.25f,  1.0f, 0.0f,
+		 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
+		 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
+		-0.25f,  0.25f, -0.25f,  0.0f, 1.0f,
+		-0.25f, -0.25f, -0.25f,  0.0f, 0.0f,
 
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
+		 0.25f, -0.25f,  0.25f,  1.0f, 0.0f,
+		 0.25f,  0.25f,  0.25f,  1.0f, 1.0f,
+		 0.25f,  0.25f,  0.25f,  1.0f, 1.0f,
+		-0.25f,  0.25f,  0.25f,  0.0f, 1.0f,
+		-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
 
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
+		-0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
+		-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
+		-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
+		-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
+		-0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
 
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
+		 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
+		 0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
+		 0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
+		 0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
+		 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
 
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
+		 0.25f, -0.25f, -0.25f,  1.0f, 1.0f,
+		 0.25f, -0.25f,  0.25f,  1.0f, 0.0f,
+		 0.25f, -0.25f,  0.25f,  1.0f, 0.0f,
+		-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
+		-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
 
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+		-0.25f,  0.25f, -0.25f,  0.0f, 1.0f,
+		 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
+		 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
+		 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
+		-0.25f,  0.25f,  0.25f,  0.0f, 0.0f,
+		-0.25f,  0.25f, -0.25f,  0.0f, 1.0f
 	};
 	
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
@@ -255,7 +260,10 @@ void processInput(GLFWwindow* window) {
 		camera.processInput(LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.processInput(RIGHT, deltaTime);
-	
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		camera.processInput(UP, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+		camera.processInput(DOWN, deltaTime);
 }
 
 void mouse_callBack(GLFWwindow* window, double xpos, double ypos) {
