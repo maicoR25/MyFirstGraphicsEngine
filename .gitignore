@@ -1,5 +1,4 @@
 .vs/
-**/x64/
 *.user
-MyFirstG.*/
-./build/
+/build/
+*.ini

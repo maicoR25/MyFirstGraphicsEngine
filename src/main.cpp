@@ -4,6 +4,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "imgui/imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 #include "headers/shader.h"
 #include "headers/stb_image.h"
 #include "headers/camera.h"
@@ -35,8 +38,8 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	
 
+	
 	GLFWwindow* window = glfwCreateWindow(INITAIL_WINDOW_WIDTH, INITAIL_WINDOW_HEIGHT, "LearnOpenGL", NULL, NULL);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callBack);
@@ -56,6 +59,17 @@ int main() {
 	
 	glViewport(0, 0, 800, 600);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+	ImGui_ImplOpenGL3_Init();
 
 
 	unsigned int indices[] = {
@@ -117,6 +131,11 @@ int main() {
 	};
 
 	while (!glfwWindowShouldClose(window)) {
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		ImGui::ShowDemoWindow();
+
 		processInput(window);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -140,26 +159,24 @@ int main() {
 
 		glBindVertexArray(VAO);
 	
-		for (unsigned int x = 0; x < 16; x++) {
-			for (unsigned int y = 0; y < 64; y++) {
-				for (unsigned int z = 0; z < 16; z++) {
-					glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 model = glm::mat4(1.0f);
 
-					model = glm::translate(model, glm::vec3(x, y, z));
-					model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-					model = glm::rotate(model, (float)glm::radians(glfwGetTime()), glm::vec3(x, y, z));
+		model = glm::translate(model, cubePositions[0]);
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		model = glm::rotate(model, (float)glm::radians(glfwGetTime()), glm::vec3(0, 0 ,0));
 
-					epicShader.setMat4("model", model);
-					drawCube();
-				}
-			}
+		epicShader.setMat4("model", model);
+		drawCube();
 
-			//drawTriangle();
-		}
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 	glfwTerminate();
 	return 0;
 }
@@ -167,6 +184,7 @@ int main() {
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
+
 void drawCube() {
 	float cubeVertices[] = {
 		// Positions		  // Texture coords
@@ -264,6 +282,10 @@ void processInput(GLFWwindow* window) {
 		camera.processInput(UP, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 		camera.processInput(DOWN, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_RELEASE)
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void mouse_callBack(GLFWwindow* window, double xpos, double ypos) {
