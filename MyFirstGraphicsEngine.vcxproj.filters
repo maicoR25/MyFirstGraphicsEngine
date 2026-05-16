@@ -68,5 +68,7 @@
     <None Include="assets\shaders\simpleFragmentShader.frag" />
     <None Include="assets\shaders\simpleVertexShader.vert" />
     <None Include="assets\shaders\cubeVertexShader.vert" />
+    <None Include="assets\shaders\lightingShader.frag" />
+    <None Include="assets\shaders\lightSourceShader.frag" />
   </ItemGroup>
 </Project>

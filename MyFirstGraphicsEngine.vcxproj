@@ -151,6 +151,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\shaders\cubeVertexShader.vert" />
+    <None Include="assets\shaders\lightingShader.frag" />
+    <None Include="assets\shaders\lightSourceShader.frag" />
     <None Include="assets\shaders\purpleFragmentShader.frag" />
     <None Include="assets\shaders\simpleFragmentShader.frag" />
     <None Include="assets\shaders\simpleVertexShader.vert" />

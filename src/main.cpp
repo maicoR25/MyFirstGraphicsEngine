@@ -11,8 +11,6 @@
 #include "headers/stb_image.h"
 #include "headers/camera.h"
 
-
-
 const int INITAIL_WINDOW_WIDTH = 800;
 const int INITAIL_WINDOW_HEIGHT = 600;
 
@@ -20,8 +18,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void mouse_callBack(GLFWwindow* window, double xpos, double ypos);
 void scroll_callBack(GLFWwindow* window, double xOffSet, double yOffSet);
-void drawCube();
-void drawTriangle();
 
 int windowWidth = INITAIL_WINDOW_WIDTH;
 int windowHeight = INITAIL_WINDOW_HEIGHT;
@@ -32,6 +28,148 @@ float lastY;
 float fov = 45;
 bool firstMouse = true;
 Camera camera;
+
+float triangleVertices[] = {
+	// Positions     	// Texture Coords
+	 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+	 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+	-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+};
+
+float texturedCubeVertices[] = {
+	// Positions		  // Texture coords
+	-0.25f, -0.25f, -0.25f,  0.0f, 0.0f,
+	 0.25f, -0.25f, -0.25f,  1.0f, 0.0f,
+	 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
+	 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
+	-0.25f,  0.25f, -0.25f,  0.0f, 1.0f,
+	-0.25f, -0.25f, -0.25f,  0.0f, 0.0f,
+
+	-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
+	 0.25f, -0.25f,  0.25f,  1.0f, 0.0f,
+	 0.25f,  0.25f,  0.25f,  1.0f, 1.0f,
+	 0.25f,  0.25f,  0.25f,  1.0f, 1.0f,
+	-0.25f,  0.25f,  0.25f,  0.0f, 1.0f,
+	-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
+
+	-0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
+	-0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
+	-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
+	-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
+	-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
+	-0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
+
+	 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
+	 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
+	 0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
+	 0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
+	 0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
+	 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
+
+	-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
+	 0.25f, -0.25f, -0.25f,  1.0f, 1.0f,
+	 0.25f, -0.25f,  0.25f,  1.0f, 0.0f,
+	 0.25f, -0.25f,  0.25f,  1.0f, 0.0f,
+	-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
+	-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
+
+	-0.25f,  0.25f, -0.25f,  0.0f, 1.0f,
+	 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
+	 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
+	 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
+	-0.25f,  0.25f,  0.25f,  0.0f, 0.0f,
+	-0.25f,  0.25f, -0.25f,  0.0f, 1.0f
+};
+
+float cubeVertices[] = {
+	// Positions
+	-0.25f, -0.25f, -0.25f,
+	 0.25f, -0.25f, -0.25f,
+	 0.25f,  0.25f, -0.25f,
+	 0.25f,  0.25f, -0.25f,
+	-0.25f,  0.25f, -0.25f,
+	-0.25f, -0.25f, -0.25f,
+
+	-0.25f, -0.25f,  0.25f,
+	 0.25f, -0.25f,  0.25f,
+	 0.25f,  0.25f,  0.25f,
+	 0.25f,  0.25f,  0.25f,
+	-0.25f,  0.25f,  0.25f,
+	-0.25f, -0.25f,  0.25f,
+
+	-0.25f,  0.25f,  0.25f,
+	-0.25f,  0.25f, -0.25f,
+	-0.25f, -0.25f, -0.25f,
+	-0.25f, -0.25f, -0.25f,
+	-0.25f, -0.25f,  0.25f,
+	-0.25f,  0.25f,  0.25f,
+
+	 0.25f,  0.25f,  0.25f,
+	 0.25f,  0.25f, -0.25f,
+	 0.25f, -0.25f, -0.25f,
+	 0.25f, -0.25f, -0.25f,
+	 0.25f, -0.25f,  0.25f,
+	 0.25f,  0.25f,  0.25f,
+
+	-0.25f, -0.25f, -0.25f,
+	 0.25f, -0.25f, -0.25f,
+	 0.25f, -0.25f,  0.25f,
+	 0.25f, -0.25f,  0.25f,
+	-0.25f, -0.25f,  0.25f,
+	-0.25f, -0.25f, -0.25f,
+
+	-0.25f,  0.25f, -0.25f,
+	 0.25f,  0.25f, -0.25f,
+	 0.25f,  0.25f,  0.25f,
+	 0.25f,  0.25f,  0.25f,
+	-0.25f,  0.25f,  0.25f,
+	-0.25f,  0.25f, -0.25f
+};
+
+float cubeVerticesWithNormals[] = {
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+};
+
 
 int main() {
 	glfwInit();
@@ -89,14 +227,11 @@ int main() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-
-
 	/*glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);*/
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	stbi_set_flip_vertically_on_load(true);
-	Shader epicShader("assets/shaders/simpleVertexShader.vert", "assets/shaders/simpleFragmentShader.frag");
+	/*stbi_set_flip_vertically_on_load(true);
 	int width, height, nrChannels;
 	unsigned char* data = stbi_load("assets/textures/container.jpg", &width, &height, &nrChannels, 0);
 
@@ -110,15 +245,12 @@ int main() {
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
-
-	epicShader.use();
-	epicShader.setInt("texture1", 0);
+	stbi_image_free(data);*/	
 	
 	glEnable(GL_DEPTH_TEST);
-	stbi_image_free(data);
 
 	glm::vec3 cubePositions[] = {
-		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(0.0f,  0.0f,  -1.0f),
 		glm::vec3(2.0f,  5.0f, -15.0f),
 		glm::vec3(-1.5f, -2.2f, -2.5f),
 		glm::vec3(-3.8f, -2.0f, -12.3f),
@@ -129,6 +261,33 @@ int main() {
 		glm::vec3(1.5f,  0.2f, -1.5f),
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
+
+
+	// Create a cube object
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVerticesWithNormals), cubeVerticesWithNormals, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+
+	// Lights Chapter 
+
+	// Compile Shaders
+	Shader cubeShader("assets/shaders/cubeVertexShader.vert", "assets/shaders/lightingShader.frag");
+	Shader lightShader("assets/shaders/simpleVertexShader.vert", "assets/shaders/lightSourceShader.frag");
+
+	// Create light source object
+	unsigned int lightVAO;
+	glGenVertexArrays(1, &lightVAO);
+	glBindVertexArray(lightVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, lightVAO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+	glm::vec3 lightPos(0.5f, 0.5f, -1.5f);
 
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplOpenGL3_NewFrame();
@@ -143,30 +302,44 @@ int main() {
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-		epicShader.use();
+		
 		std::cout << std::string("FPS: ") << 1 / deltaTime << std::endl;
 
 		glm::mat4 view = glm::mat4(1.0f);
 		view = camera.getViewMatrix();
 		
-		
 		glm::mat4 projection = glm::mat4(1.0f);
 		projection = glm::perspective(glm::radians(fov), ((float)windowWidth / windowHeight), 0.1f, 100.0f);
 
-
-		epicShader.setMat4("view", view);
-		epicShader.setMat4("projection", projection);
-
-		glBindVertexArray(VAO);
-	
 		glm::mat4 model = glm::mat4(1.0f);
-
 		model = glm::translate(model, cubePositions[0]);
 		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-		model = glm::rotate(model, (float)glm::radians(glfwGetTime()), glm::vec3(0, 0 ,0));
+		//model = glm::rotate(model, (float)glm::radians(glfwGetTime()), glm::vec3(0, 0 ,0));
 
-		epicShader.setMat4("model", model);
-		drawCube();
+		cubeShader.use();
+		cubeShader.setVec3("objectColor", 0.2f, 0.5f, 1.0f);
+		cubeShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+		cubeShader.setMat4("model", model);
+		cubeShader.setMat4("view", view);
+		cubeShader.setMat4("projection", projection);
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		/*glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture1);*/
+
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f));
+
+		lightShader.use();
+		lightShader.setMat4("model", model);
+		lightShader.setMat4("view", view);
+		lightShader.setMat4("projection", projection);
+		glBindVertexArray(lightVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -183,88 +356,6 @@ int main() {
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
-}
-
-void drawCube() {
-	float cubeVertices[] = {
-		// Positions		  // Texture coords
-		-0.25f, -0.25f, -0.25f,  0.0f, 0.0f,
-		 0.25f, -0.25f, -0.25f,  1.0f, 0.0f,
-		 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
-		 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
-		-0.25f,  0.25f, -0.25f,  0.0f, 1.0f,
-		-0.25f, -0.25f, -0.25f,  0.0f, 0.0f,
-
-		-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
-		 0.25f, -0.25f,  0.25f,  1.0f, 0.0f,
-		 0.25f,  0.25f,  0.25f,  1.0f, 1.0f,
-		 0.25f,  0.25f,  0.25f,  1.0f, 1.0f,
-		-0.25f,  0.25f,  0.25f,  0.0f, 1.0f,
-		-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
-
-		-0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-		-0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
-		-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-		-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-		-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
-		-0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-
-		 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-		 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
-		 0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-		 0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-		 0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
-		 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-
-		-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-		 0.25f, -0.25f, -0.25f,  1.0f, 1.0f,
-		 0.25f, -0.25f,  0.25f,  1.0f, 0.0f,
-		 0.25f, -0.25f,  0.25f,  1.0f, 0.0f,
-		-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
-		-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-
-		-0.25f,  0.25f, -0.25f,  0.0f, 1.0f,
-		 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
-		 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-		 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-		-0.25f,  0.25f,  0.25f,  0.0f, 0.0f,
-		-0.25f,  0.25f, -0.25f,  0.0f, 1.0f
-	};
-	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
-
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-}
-
-void drawTriangle() {
-	float vertices[] = {
-		// Positions     	// Texture Coords
-		 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-		 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-	};
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
 }
 
 void processInput(GLFWwindow* window) {
