@@ -64,7 +64,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\shaders\purpleFragmentShader.frag" />
     <None Include="assets\shaders\simpleFragmentShader.frag" />
     <None Include="assets\shaders\simpleVertexShader.vert" />
     <None Include="assets\shaders\cubeVertexShader.vert" />

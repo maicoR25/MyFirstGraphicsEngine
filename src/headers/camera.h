@@ -10,7 +10,8 @@ enum Camera_Movement {
 	LEFT,
 	RIGHT,
 	UP, 
-	DOWN
+	DOWN,
+	NONE
 };
 
 
@@ -51,6 +52,7 @@ public:
 			Position += Up * cameraSpeed;
 		if (direction == DOWN)
 			Position -= Up * cameraSpeed;
+		
 
 		//if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 		//	speed += 0.05;

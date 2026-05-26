@@ -27,6 +27,7 @@ float lastX;
 float lastY;
 float fov = 45;
 bool firstMouse = true;
+bool cameraMovementEnabled = true;
 Camera camera;
 
 float triangleVertices[] = {
@@ -314,11 +315,15 @@ int main() {
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, cubePositions[0]);
 		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-		//model = glm::rotate(model, (float)glm::radians(glfwGetTime()), glm::vec3(0, 0 ,0));
+		model = glm::rotate(model, (float)glm::radians(glfwGetTime()) * 10, glm::vec3(0, 5, 0));
+
+		lightPos = glm::vec3(cubePositions[0].x + 2 * cos((float)glm::radians(glfwGetTime() * 20)), cubePositions[0].y + .75f, cubePositions[0].z + 2 * sin((float)glm::radians(20 * glfwGetTime())));
 
 		cubeShader.use();
-		cubeShader.setVec3("objectColor", 0.2f, 0.5f, 1.0f);
+		cubeShader.setVec3("objectColor", 0.2f, 0.5f, 0.0f);
 		cubeShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+		cubeShader.setVec3("lightPos", lightPos);
+		cubeShader.setVec3("viewPos", camera.Position);
 		cubeShader.setMat4("model", model);
 		cubeShader.setMat4("view", view);
 		cubeShader.setMat4("projection", projection);
@@ -373,13 +378,24 @@ void processInput(GLFWwindow* window) {
 		camera.processInput(UP, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 		camera.processInput(DOWN, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) {		
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_RELEASE)
+		if (cameraMovementEnabled == true) {
+			glfwSetCursorPos(window, windowWidth / 2, windowHeight / 2);
+			cameraMovementEnabled = false;
+		}
+		firstMouse = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_RELEASE) {
+		cameraMovementEnabled = true;
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
 }
 
 void mouse_callBack(GLFWwindow* window, double xpos, double ypos) {
+	if (!cameraMovementEnabled) {
+		return;
+	}
 	std::cout << xpos << ", " << ypos << std::endl;
 	if (firstMouse) {
 		lastX = xpos;
