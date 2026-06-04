@@ -266,10 +266,7 @@ int main() {
 
 	// Create a cube object
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVerticesWithNormals), cubeVerticesWithNormals, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	
 
 
 	// Lights Chapter 
@@ -322,7 +319,14 @@ int main() {
 		cubeShader.use();
 		cubeShader.setVec3("objectColor", 0.2f, 0.5f, 0.0f);
 		cubeShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-		cubeShader.setVec3("lightPos", lightPos);
+		cubeShader.setVec3("material.ambient", 0.0f, 0.5f, 0.31f);
+		cubeShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+		cubeShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+		cubeShader.setFloat("material.shininess", 32.0f);
+		cubeShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+		cubeShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+		cubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+		cubeShader.setVec3("light.position", lightPos);
 		cubeShader.setVec3("viewPos", camera.Position);
 		cubeShader.setMat4("model", model);
 		cubeShader.setMat4("view", view);
