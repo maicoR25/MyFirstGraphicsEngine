@@ -199,6 +199,8 @@ int main() {
 	glViewport(0, 0, 800, 600);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+	// Setup stbi flags
+	stbi_set_flip_vertically_on_load(true);
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -232,22 +234,7 @@ int main() {
 	glEnableVertexAttribArray(2);*/
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	/*stbi_set_flip_vertically_on_load(true);
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("assets/textures/container.jpg", &width, &height, &nrChannels, 0);
-
-	unsigned int texture1, texture2;
-	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	stbi_image_free(data);*/	
-	
+		
 	glEnable(GL_DEPTH_TEST);
 
 	glm::vec3 cubePositions[] = {
