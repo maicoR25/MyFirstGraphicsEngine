@@ -8,11 +8,12 @@
 #include <iostream>
 
 #include "imgui/imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include "imgui/backends/imgui_impl_glfw.h"
+#include "imgui/backends/imgui_impl_opengl3.h"
 #include "headers/shader.h"
 #include "headers/camera.h"
 #include "headers/model.h"
+#include "gui/gui_manager.h"
 
 const int INITAIL_WINDOW_WIDTH = 800;
 const int INITAIL_WINDOW_HEIGHT = 600;
@@ -206,16 +207,6 @@ int main() {
 
 	// Setup stbi flags
 	stbi_set_flip_vertically_on_load(true);
-
-	// Setup Dear ImGui context
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-
-	// Setup Platform/Renderer backends
-	ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
-	ImGui_ImplOpenGL3_Init();
 		
 	glEnable(GL_DEPTH_TEST);
 
@@ -246,13 +237,16 @@ int main() {
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
-	while (!glfwWindowShouldClose(window)) {
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-		ImGui::ShowDemoWindow();
+	GUIManager guiManager(window);
 
+	while (!glfwWindowShouldClose(window)) {
+		glfwPollEvents();
 		processInput(window);
+
+		guiManager.CreateNewFrame();
+		guiManager.DrawDemoWindow();
+
+		
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glfwGetWindowSize(window, &windowWidth, &windowHeight);
@@ -310,15 +304,12 @@ int main() {
 		//glBindVertexArray(lightVAO);
 		//glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		guiManager.DrawGUI();
+
 		glfwSwapBuffers(window);
-		glfwPollEvents();
 	}
 
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
+	
 	glfwTerminate();
 	return 0;
 }

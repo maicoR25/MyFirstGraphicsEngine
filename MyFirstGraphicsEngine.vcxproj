@@ -108,7 +108,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)external\includes\imgui\backends;$(ProjectDir)external\includes\imgui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)external\includes\;$(ProjectDir)external\includes\imgui\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -140,25 +140,36 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="external\includes\imgui\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="external\includes\imgui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="external\includes\imgui\imgui.cpp" />
+    <ClCompile Include="external\includes\imgui\imgui_demo.cpp" />
+    <ClCompile Include="external\includes\imgui\imgui_draw.cpp" />
+    <ClCompile Include="external\includes\imgui\imgui_tables.cpp" />
+    <ClCompile Include="external\includes\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\glad.c" />
-    <ClCompile Include="src\imgui\imgui.cpp" />
-    <ClCompile Include="src\imgui\imgui_demo.cpp" />
-    <ClCompile Include="src\imgui\imgui_draw.cpp" />
-    <ClCompile Include="src\imgui\imgui_impl_glfw.cpp" />
-    <ClCompile Include="src\imgui\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="src\imgui\imgui_tables.cpp" />
-    <ClCompile Include="src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="external\includes\imgui\backends\imgui_impl_glfw.h" />
+    <ClInclude Include="external\includes\imgui\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="external\includes\imgui\backends\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="external\includes\imgui\imconfig.h" />
+    <ClInclude Include="external\includes\imgui\imgui.h" />
+    <ClInclude Include="external\includes\imgui\imgui_internal.h" />
+    <ClInclude Include="external\includes\imgui\imstb_rectpack.h" />
+    <ClInclude Include="external\includes\imgui\imstb_textedit.h" />
+    <ClInclude Include="external\includes\imgui\imstb_truetype.h" />
     <ClInclude Include="headers\shader.h" />
     <ClInclude Include="headers\stb_image.h" />
+    <ClInclude Include="src\gui\gui_manager.h" />
+    <ClInclude Include="src\gui\gui_panel.h" />
     <ClInclude Include="src\headers\camera.h" />
     <ClInclude Include="src\headers\mesh.h" />
     <ClInclude Include="src\headers\model.h" />
     <ClInclude Include="src\headers\shader.h" />
-    <ClInclude Include="src\headers\stb_image.h" />
+    <ClInclude Include="external\includes\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\shaders\cubeVertexShader.vert" />
