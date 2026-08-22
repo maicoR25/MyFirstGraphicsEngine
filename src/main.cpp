@@ -1,15 +1,18 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include <iostream>
+
 #include "imgui/imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "headers/shader.h"
-#include "headers/stb_image.h"
 #include "headers/camera.h"
+#include "headers/model.h"
 
 const int INITAIL_WINDOW_WIDTH = 800;
 const int INITAIL_WINDOW_HEIGHT = 600;
@@ -18,6 +21,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void mouse_callBack(GLFWwindow* window, double xpos, double ypos);
 void scroll_callBack(GLFWwindow* window, double xOffSet, double yOffSet);
+void key_callBack(GLFWwindow* window, int key, int scanCode, int action, int mods);
 
 int windowWidth = INITAIL_WINDOW_WIDTH;
 int windowHeight = INITAIL_WINDOW_HEIGHT;
@@ -183,6 +187,7 @@ int main() {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callBack);
 	glfwSetScrollCallback(window, scroll_callBack);
+	glfwSetKeyCallback(window, key_callBack);
 
 	if (window == NULL) {
 		std::cout << "Failed to create GLFW Window" << std::endl;
@@ -211,29 +216,6 @@ int main() {
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
 	ImGui_ImplOpenGL3_Init();
-
-
-	unsigned int indices[] = {
-		0, 1, 3,
-		1, 2, 3
-	};
-
-
-	unsigned int VAO, VBO, EBO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	/*glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);*/
-
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		
 	glEnable(GL_DEPTH_TEST);
 
@@ -250,30 +232,20 @@ int main() {
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 
-
-	// Create a cube object
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVerticesWithNormals), cubeVerticesWithNormals, GL_STATIC_DRAW);
-	
-
-
-	// Lights Chapter 
-
 	// Compile Shaders
 	Shader cubeShader("assets/shaders/cubeVertexShader.vert", "assets/shaders/lightingShader.frag");
 	Shader lightShader("assets/shaders/simpleVertexShader.vert", "assets/shaders/lightSourceShader.frag");
+	Shader modelShader("assets/shaders/modelVertexShader.vert", "assets/shaders/modelFragmentShader.frag");
 
-	// Create light source object
-	unsigned int lightVAO;
-	glGenVertexArrays(1, &lightVAO);
-	glBindVertexArray(lightVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, lightVAO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
+	// Meshes/Models Chapter
 
-	glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-	glm::vec3 lightPos(0.5f, 0.5f, -1.5f);
+	Model backpack("assets/models/backpack/backpack.obj");
+	Model cube("assets/models/cube.obj");
+	Model ayaya("assets/models/ayaka/body.obj");
 
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -288,7 +260,7 @@ int main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		
-		std::cout << std::string("FPS: ") << 1 / deltaTime << std::endl;
+		//std::cout << std::string("FPS: ") << 1 / deltaTime << std::endl;
 
 		glm::mat4 view = glm::mat4(1.0f);
 		view = camera.getViewMatrix();
@@ -298,10 +270,21 @@ int main() {
 
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, cubePositions[0]);
-		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-		model = glm::rotate(model, (float)glm::radians(glfwGetTime()) * 10, glm::vec3(0, 5, 0));
+		model = glm::scale(model, glm::vec3(0.5f));
 
-		lightPos = glm::vec3(cubePositions[0].x + 2 * cos((float)glm::radians(glfwGetTime() * 20)), cubePositions[0].y + .75f, cubePositions[0].z + 2 * sin((float)glm::radians(20 * glfwGetTime())));
+		modelShader.use();
+		modelShader.setMat4("model", model);
+		modelShader.setMat4("projection", projection);
+		modelShader.setMat4("view", view);
+		backpack.Draw(modelShader);
+
+		//model = glm::translate(model, cubePositions[1]);
+		//modelShader.setMat4("model", model);
+		//ayaya.Draw(modelShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 5.0f));
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
 		cubeShader.use();
 		cubeShader.setVec3("objectColor", 0.2f, 0.5f, 0.0f);
@@ -313,29 +296,19 @@ int main() {
 		cubeShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
 		cubeShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // darken diffuse light a bit
 		cubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-		cubeShader.setVec3("light.position", lightPos);
+		cubeShader.setVec3("light.position", 1.0f, 2.0f, 1.0f);
 		cubeShader.setVec3("viewPos", camera.Position);
 		cubeShader.setMat4("model", model);
 		cubeShader.setMat4("view", view);
 		cubeShader.setMat4("projection", projection);
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		cube.Draw(cubeShader);
 
-		/*glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);*/
-
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f));
-
-		lightShader.use();
-		lightShader.setMat4("model", model);
-		lightShader.setMat4("view", view);
-		lightShader.setMat4("projection", projection);
-		glBindVertexArray(lightVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
+		//lightShader.use();
+		//lightShader.setMat4("model", model);
+		//lightShader.setMat4("view", view);
+		//lightShader.setMat4("projection", projection);
+		//glBindVertexArray(lightVAO);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -369,18 +342,6 @@ void processInput(GLFWwindow* window) {
 		camera.processInput(UP, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 		camera.processInput(DOWN, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) {		
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		if (cameraMovementEnabled == true) {
-			glfwSetCursorPos(window, windowWidth / 2, windowHeight / 2);
-			cameraMovementEnabled = false;
-		}
-		firstMouse = true;
-	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_RELEASE) {
-		cameraMovementEnabled = true;
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	}
 }
 
 void mouse_callBack(GLFWwindow* window, double xpos, double ypos) {
@@ -407,5 +368,23 @@ void scroll_callBack(GLFWwindow* window, double xOffSet, double yOffSet) {
 	} 
 	if (fov > 45.0f) {
 		fov = 45.0f;
+	}
+}
+
+void key_callBack(GLFWwindow* window, int key, int scanCode, int action, int mods) {
+	if (key == GLFW_KEY_LEFT_ALT) {
+		if (action == GLFW_PRESS) {
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			if (cameraMovementEnabled == true) {
+				glfwSetCursorPos(window, windowWidth / 2, windowHeight / 2);
+				cameraMovementEnabled = false;
+			}
+			firstMouse = true;
+		}
+		else if (action == GLFW_RELEASE) {
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			glfwSetCursorPos(window, windowWidth / 2, windowHeight / 2);
+			cameraMovementEnabled = true;
+		}
 	}
 }

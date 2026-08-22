@@ -13,6 +13,7 @@ struct Vertex {
 struct Texture {
 	unsigned int id;
 	std::string type;
+	std::string path;
 };
 
 class Mesh {
@@ -32,7 +33,7 @@ public:
 		unsigned int diffuseNr = 1;
 		unsigned int specularNr = 1;
 		for (unsigned int i = 0; i < textures.size(); i++) {
-			glActiveTexture(GL_TEXTURE + i);
+			glActiveTexture(GL_TEXTURE0 + i);
 
 			std::string number;
 			std::string name = textures[i].type;

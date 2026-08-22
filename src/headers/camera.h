@@ -14,8 +14,6 @@ enum Camera_Movement {
 	NONE
 };
 
-
-
 class Camera {
 public:
 	float speed = 2.5f;
@@ -52,13 +50,6 @@ public:
 			Position += Up * cameraSpeed;
 		if (direction == DOWN)
 			Position -= Up * cameraSpeed;
-		
-
-		//if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		//	speed += 0.05;
-		//if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && cameraSpeed - 0.05 >= 0)
-		//	speed -= 0.05;
-		//std::cout << std::string("Camera Speed: ") << cameraSpeed << std::endl;
 	}
 
 	glm::mat4 getViewMatrix() {
@@ -82,6 +73,10 @@ public:
 		updateCameraVectors();
 	}
 
+	glm::vec4 mousePosRayCast() {
+
+
+	}
 
 private:
 	void updateCameraVectors() {
