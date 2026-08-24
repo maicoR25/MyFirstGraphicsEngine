@@ -7,13 +7,11 @@
 
 #include <iostream>
 
-#include "imgui/imgui.h"
-#include "imgui/backends/imgui_impl_glfw.h"
-#include "imgui/backends/imgui_impl_opengl3.h"
 #include "headers/shader.h"
 #include "headers/camera.h"
 #include "headers/model.h"
 #include "gui/gui_manager.h"
+#include "gui/panels/inspector_panel.h"
 
 const int INITAIL_WINDOW_WIDTH = 800;
 const int INITAIL_WINDOW_HEIGHT = 600;
@@ -35,155 +33,12 @@ bool firstMouse = true;
 bool cameraMovementEnabled = true;
 Camera camera;
 
-float triangleVertices[] = {
-	// Positions     	// Texture Coords
-	 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-	 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-	-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-};
-
-float texturedCubeVertices[] = {
-	// Positions		  // Texture coords
-	-0.25f, -0.25f, -0.25f,  0.0f, 0.0f,
-	 0.25f, -0.25f, -0.25f,  1.0f, 0.0f,
-	 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
-	 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
-	-0.25f,  0.25f, -0.25f,  0.0f, 1.0f,
-	-0.25f, -0.25f, -0.25f,  0.0f, 0.0f,
-
-	-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
-	 0.25f, -0.25f,  0.25f,  1.0f, 0.0f,
-	 0.25f,  0.25f,  0.25f,  1.0f, 1.0f,
-	 0.25f,  0.25f,  0.25f,  1.0f, 1.0f,
-	-0.25f,  0.25f,  0.25f,  0.0f, 1.0f,
-	-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
-
-	-0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-	-0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
-	-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-	-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-	-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
-	-0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-
-	 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-	 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
-	 0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-	 0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-	 0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
-	 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-
-	-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-	 0.25f, -0.25f, -0.25f,  1.0f, 1.0f,
-	 0.25f, -0.25f,  0.25f,  1.0f, 0.0f,
-	 0.25f, -0.25f,  0.25f,  1.0f, 0.0f,
-	-0.25f, -0.25f,  0.25f,  0.0f, 0.0f,
-	-0.25f, -0.25f, -0.25f,  0.0f, 1.0f,
-
-	-0.25f,  0.25f, -0.25f,  0.0f, 1.0f,
-	 0.25f,  0.25f, -0.25f,  1.0f, 1.0f,
-	 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-	 0.25f,  0.25f,  0.25f,  1.0f, 0.0f,
-	-0.25f,  0.25f,  0.25f,  0.0f, 0.0f,
-	-0.25f,  0.25f, -0.25f,  0.0f, 1.0f
-};
-
-float cubeVertices[] = {
-	// Positions
-	-0.25f, -0.25f, -0.25f,
-	 0.25f, -0.25f, -0.25f,
-	 0.25f,  0.25f, -0.25f,
-	 0.25f,  0.25f, -0.25f,
-	-0.25f,  0.25f, -0.25f,
-	-0.25f, -0.25f, -0.25f,
-
-	-0.25f, -0.25f,  0.25f,
-	 0.25f, -0.25f,  0.25f,
-	 0.25f,  0.25f,  0.25f,
-	 0.25f,  0.25f,  0.25f,
-	-0.25f,  0.25f,  0.25f,
-	-0.25f, -0.25f,  0.25f,
-
-	-0.25f,  0.25f,  0.25f,
-	-0.25f,  0.25f, -0.25f,
-	-0.25f, -0.25f, -0.25f,
-	-0.25f, -0.25f, -0.25f,
-	-0.25f, -0.25f,  0.25f,
-	-0.25f,  0.25f,  0.25f,
-
-	 0.25f,  0.25f,  0.25f,
-	 0.25f,  0.25f, -0.25f,
-	 0.25f, -0.25f, -0.25f,
-	 0.25f, -0.25f, -0.25f,
-	 0.25f, -0.25f,  0.25f,
-	 0.25f,  0.25f,  0.25f,
-
-	-0.25f, -0.25f, -0.25f,
-	 0.25f, -0.25f, -0.25f,
-	 0.25f, -0.25f,  0.25f,
-	 0.25f, -0.25f,  0.25f,
-	-0.25f, -0.25f,  0.25f,
-	-0.25f, -0.25f, -0.25f,
-
-	-0.25f,  0.25f, -0.25f,
-	 0.25f,  0.25f, -0.25f,
-	 0.25f,  0.25f,  0.25f,
-	 0.25f,  0.25f,  0.25f,
-	-0.25f,  0.25f,  0.25f,
-	-0.25f,  0.25f, -0.25f
-};
-
-float cubeVerticesWithNormals[] = {
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-};
-
-
 int main() {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	
 	GLFWwindow* window = glfwCreateWindow(INITAIL_WINDOW_WIDTH, INITAIL_WINDOW_HEIGHT, "LearnOpenGL", NULL, NULL);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callBack);
@@ -210,19 +65,6 @@ int main() {
 		
 	glEnable(GL_DEPTH_TEST);
 
-	glm::vec3 cubePositions[] = {
-		glm::vec3(0.0f,  0.0f,  -1.0f),
-		glm::vec3(2.0f,  5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3(2.4f, -0.4f, -3.5f),
-		glm::vec3(-1.7f,  3.0f, -7.5f),
-		glm::vec3(1.3f, -2.0f, -2.5f),
-		glm::vec3(1.5f,  2.0f, -2.5f),
-		glm::vec3(1.5f,  0.2f, -1.5f),
-		glm::vec3(-1.3f,  1.0f, -1.5f)
-	};
-
 	// Compile Shaders
 	Shader cubeShader("assets/shaders/cubeVertexShader.vert", "assets/shaders/lightingShader.frag");
 	Shader lightShader("assets/shaders/simpleVertexShader.vert", "assets/shaders/lightSourceShader.frag");
@@ -238,14 +80,22 @@ int main() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
 	GUIManager guiManager(window);
+	guiManager.AddPanel([]() {
+		ImGui::Begin("Test");
+		ImGui::Text("awesome test panel");
+		ImGui::End();
+	});
+
+	guiManager.AddPanel(std::make_unique<InspectorPanel>());
+
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		processInput(window);
 
 		guiManager.CreateNewFrame();
-		guiManager.DrawDemoWindow();
-
+		
+		//guiManager.DrawDemoWindow();
 		
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -263,7 +113,7 @@ int main() {
 		projection = glm::perspective(glm::radians(fov), ((float)windowWidth / windowHeight), 0.1f, 100.0f);
 
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, cubePositions[0]);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.0f));
 		model = glm::scale(model, glm::vec3(0.5f));
 
 		modelShader.use();

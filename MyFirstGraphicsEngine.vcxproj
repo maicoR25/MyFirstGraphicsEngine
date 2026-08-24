@@ -165,6 +165,7 @@
     <ClInclude Include="headers\stb_image.h" />
     <ClInclude Include="src\gui\gui_manager.h" />
     <ClInclude Include="src\gui\gui_panel.h" />
+    <ClInclude Include="src\gui\panels\inspector_panel.h" />
     <ClInclude Include="src\headers\camera.h" />
     <ClInclude Include="src\headers\mesh.h" />
     <ClInclude Include="src\headers\model.h" />
