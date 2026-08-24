@@ -14,6 +14,8 @@ public:
 		
 		ImGui::Text("Insepctor Panel");
 		ImGui::Text("Window Size: %f %f", screenSize.x, screenSize.y);
+
+		ImGui::Text("FPS: %f");
 		ImGui::End();
 	}
 };
