@@ -10,6 +10,7 @@
 #include "headers/shader.h"
 #include "headers/camera.h"
 #include "headers/model.h"
+#include "headers/scene_object.h"
 #include "gui/gui_manager.h"
 #include "gui/panels/inspector_panel.h"
 
@@ -80,14 +81,8 @@ int main() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
 	GUIManager guiManager(window);
-	guiManager.AddPanel([]() {
-		ImGui::Begin("Test");
-		ImGui::Text("awesome test panel");
-		ImGui::End();
-	});
 
 	guiManager.AddPanel(std::make_unique<InspectorPanel>());
-
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
