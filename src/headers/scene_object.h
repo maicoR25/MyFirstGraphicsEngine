@@ -9,7 +9,9 @@
 
 class SceneObject {
 public:
-	SceneObject(std::shared_ptr<Model> model) {
+	const unsigned int id;
+
+	SceneObject(std::shared_ptr<Model> model) : id(nextID++) {
 		objectModel = model;
 	}
 
@@ -26,6 +28,7 @@ public:
 
 private:
 	std::shared_ptr<Model> objectModel;
+	inline static unsigned int nextID = 0;
 
 	glm::mat4 modelMatrix() {
 		glm::mat4 model(1.0f);

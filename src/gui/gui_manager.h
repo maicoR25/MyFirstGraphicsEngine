@@ -11,6 +11,8 @@
 
 class GUIManager {
 public:
+	Scene* m_activeScene = nullptr;
+
 	// Initializes the ImGUI context
 	GUIManager(GLFWwindow* window) {
 		IMGUI_CHECKVERSION();
@@ -33,7 +35,7 @@ public:
 	// Iterates through the GUIPanels and the lambdaPanels vectors and draws them to the screen
 	void DrawGUI() {
 		for (unsigned int i = 0; i < m_guiPanels.size(); i++) {
-			m_guiPanels[i]->draw();
+			m_guiPanels[i]->draw(m_activeScene);
 		}
 		for (unsigned int i = 0; i < m_lambdaPanels.size(); i++) {
 			m_lambdaPanels[i]();
@@ -57,6 +59,10 @@ public:
 	// Creates an imgui window by passing in a lambda function
 	void AddPanel(std::function<void()> renderCallback) {
 		m_lambdaPanels.push_back(renderCallback);
+	}
+
+	void SetScene(Scene* scene) {
+		m_activeScene = scene;
 	}
 
 	void DrawDemoWindow() {

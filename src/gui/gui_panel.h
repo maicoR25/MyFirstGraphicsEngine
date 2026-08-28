@@ -6,7 +6,7 @@ class GUIPanel {
 public:
 	virtual ~GUIPanel() = default;
 
-	virtual void draw() = 0;
+	virtual void draw(Scene* scene) = 0;
 
 	bool isOpen = true;
 };

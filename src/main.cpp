@@ -11,6 +11,7 @@
 #include "headers/camera.h"
 #include "headers/model.h"
 #include "headers/scene_object.h"
+#include "headers/scene.h"
 #include "gui/gui_manager.h"
 #include "gui/panels/inspector_panel.h"
 
@@ -75,14 +76,14 @@ int main() {
 
 	std::shared_ptr backpackModel = std::make_shared<Model>("assets/models/backpack/backpack.obj");
 	Model cube("assets/models/cube.obj");
-	Model ayaya("assets/models/ayaka/body.obj");
 
-	SceneObject backpack(backpackModel);
+	Scene scene;
+	scene.addObject(std::make_unique<SceneObject>(backpackModel), &modelShader);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
 	GUIManager guiManager(window);
-
+	guiManager.SetScene(&scene);
 	guiManager.AddPanel(std::make_unique<InspectorPanel>());
 
 
@@ -91,9 +92,7 @@ int main() {
 		processInput(window);
 
 		guiManager.CreateNewFrame();
-		
-		//guiManager.DrawDemoWindow();
-		
+				
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glfwGetWindowSize(window, &windowWidth, &windowHeight);
@@ -116,12 +115,11 @@ int main() {
 		modelShader.use();
 		modelShader.setMat4("projection", projection);
 		modelShader.setMat4("view", view);
-		backpack.transform.position = glm::vec3(1.0f);
-		backpack.Draw(modelShader);
 
-		//model = glm::translate(model, cubePositions[1]);
-		//modelShader.setMat4("model", model);
-		//ayaya.Draw(modelShader);
+
+		scene.drawScene();
+		//backpack.transform.position = glm::vec3(1.0f);
+		//backpack.Draw(modelShader);
 
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 5.0f));
