@@ -73,16 +73,18 @@ int main() {
 
 	// Meshes/Models Chapter
 
-	Model backpack("assets/models/backpack/backpack.obj");
+	std::shared_ptr backpackModel = std::make_shared<Model>("assets/models/backpack/backpack.obj");
 	Model cube("assets/models/cube.obj");
 	Model ayaya("assets/models/ayaka/body.obj");
 
+	SceneObject backpack(backpackModel);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
 	GUIManager guiManager(window);
 
 	guiManager.AddPanel(std::make_unique<InspectorPanel>());
+
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -112,9 +114,9 @@ int main() {
 		model = glm::scale(model, glm::vec3(0.5f));
 
 		modelShader.use();
-		modelShader.setMat4("model", model);
 		modelShader.setMat4("projection", projection);
 		modelShader.setMat4("view", view);
+		backpack.transform.position = glm::vec3(1.0f);
 		backpack.Draw(modelShader);
 
 		//model = glm::translate(model, cubePositions[1]);

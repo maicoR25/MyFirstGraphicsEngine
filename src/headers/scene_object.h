@@ -8,24 +8,29 @@
 #include "model.h"
 
 class SceneObject {
-public: 
-	std::shared_ptr<Model> objectModel;
+public:
+	SceneObject(std::shared_ptr<Model> model) {
+		objectModel = model;
+	}
 
 	struct Transform {
-		glm::vec3 position;
+		glm::vec3 position = glm::vec3(0.0f);
 		glm::quat rotation;
-		glm::vec3 scale;
+		glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
 	} transform;
 
-	void Draw(Shader* shader) {
-
+	void Draw(Shader& shader) {
+		shader.setMat4("model", modelMatrix());
+		objectModel->Draw(shader);
 	}
 
 private:
+	std::shared_ptr<Model> objectModel;
+
 	glm::mat4 modelMatrix() {
 		glm::mat4 model(1.0f);
 		model = glm::translate(model, transform.position);
-		model = model * glm::mat4_cast(transform.rotation);
+		//model = model * glm::mat4_cast(transform.rotation);
 		model = glm::scale(model, transform.scale);
 		return model;
 	}
