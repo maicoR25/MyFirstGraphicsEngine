@@ -15,8 +15,11 @@ public:
 
 	void draw(Scene* scene, EditorContext& context) override {
 		ImGui::Begin("Inspector", &isOpen, ImGuiWindowFlags_NoMove);
-
+		ImGui::Text("Inspector Panel");
+		
 		ImVec2 screenSize = ImGui::GetIO().DisplaySize;
+		ImGui::SetWindowPos(glm::vec2(0.0f));
+		ImGui::SetWindowSize(ImVec2(screenSize.x * .20f, screenSize.y));
 
 		// Draw Sliders to adjust transform properties
 		if (context.selectedObjectID != -1) {
@@ -29,12 +32,6 @@ public:
 			ImGui::Text("No object selected!");
 		}
 		
-		ImGui::SetWindowPos(glm::vec2(0.0f));
-		ImGui::SetWindowSize(ImVec2(screenSize.x * .20f, screenSize.y));
-		
-		ImGui::Text("Inspector Panel");
-		ImGui::Text("Window Size: %f %f", screenSize.x, screenSize.y);
-
 		ImGui::End();
 	}
 };
