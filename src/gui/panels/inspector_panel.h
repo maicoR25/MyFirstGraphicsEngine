@@ -13,15 +13,17 @@ public:
 		currentObject = object;
 	}
 
-	void draw(Scene* scene) override {
+	void draw(Scene* scene, EditorContext& context) override {
 		ImGui::Begin("Inspector", &isOpen, ImGuiWindowFlags_NoMove);
 
 		ImVec2 screenSize = ImGui::GetIO().DisplaySize;
 
 		// Draw Sliders to adjust transform properties
-		if (hasSelection) {
-			SceneObject* activeObj = scene->getObjectByID(0);
-			ImGui::DragFloat3("Position", &activeObj->transform.position.x, 0.1f);
+		if (context.selectedObjectID != -1) {
+			SceneObject* activeObj = scene->getObjectByID(context.selectedObjectID);
+			ImGui::Text("Selected Object: %s", activeObj->name.c_str());
+			ImGui::DragFloat3("Position", &activeObj->transform.position.x, 0.5f);
+			ImGui::DragFloat3("Scale", &activeObj->transform.scale.x, 0.5f);
 		}
 		else {
 			ImGui::Text("No object selected!");
@@ -33,10 +35,6 @@ public:
 		ImGui::Text("Inspector Panel");
 		ImGui::Text("Window Size: %f %f", screenSize.x, screenSize.y);
 
-		ImGui::Text("FPS: %f");
 		ImGui::End();
 	}
-private:
-	bool hasSelection = true;
-	unsigned int selectedObjectID = 0;
 };

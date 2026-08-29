@@ -6,6 +6,9 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
+#include <string>
+#include <format>
+#include <memory>
 
 #include "headers/shader.h"
 #include "headers/camera.h"
@@ -14,6 +17,7 @@
 #include "headers/scene.h"
 #include "gui/gui_manager.h"
 #include "gui/panels/inspector_panel.h"
+#include "gui/panels/hierarchy_panel.h"
 
 const int INITAIL_WINDOW_WIDTH = 800;
 const int INITAIL_WINDOW_HEIGHT = 600;
@@ -41,7 +45,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(INITAIL_WINDOW_WIDTH, INITAIL_WINDOW_HEIGHT, "LearnOpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(INITAIL_WINDOW_WIDTH, INITAIL_WINDOW_HEIGHT, "ProjectAbloom", NULL, NULL);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callBack);
 	glfwSetScrollCallback(window, scroll_callBack);
@@ -68,24 +72,51 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	// Compile Shaders
-	Shader cubeShader("assets/shaders/cubeVertexShader.vert", "assets/shaders/lightingShader.frag");
+	Shader cubeShader("assets/shaders/cubeVertexShader.vert", "assets/shaders/lightingShader.frag");		
+	cubeShader.bindUniformBlock("CameraData", 0);
 	Shader lightShader("assets/shaders/simpleVertexShader.vert", "assets/shaders/lightSourceShader.frag");
 	Shader modelShader("assets/shaders/modelVertexShader.vert", "assets/shaders/modelFragmentShader.frag");
+	modelShader.bindUniformBlock("CameraData", 0);
 
 	// Meshes/Models Chapter
 
 	std::shared_ptr backpackModel = std::make_shared<Model>("assets/models/backpack/backpack.obj");
-	Model cube("assets/models/cube.obj");
+	std::shared_ptr cubeModel = std::make_shared<Model>("assets/models/cube.obj");
 
 	Scene scene;
-	scene.addObject(std::make_unique<SceneObject>(backpackModel), &modelShader);
+	//scene.addObject(std::make_unique<SceneObject>(backpackModel), &modelShader);
+	scene.addObject(std::make_unique<SceneObject>(cubeModel), &cubeShader);
+
+	for (int i = 1; i < 10; i++) {
+		scene.addObject(std::make_unique<SceneObject>(backpackModel), &modelShader);
+		if (auto* backpack = scene.getObjectByID(i)) {
+			backpack->transform.position = glm::vec3(0.0f, 0.0f, -5.0f + i * 2);
+			backpack->name = std::format("Backpack {0}", i);
+		}
+	}
+
+	if (auto* cube = scene.getObjectByID(0)) {
+		cube->transform.position = glm::vec3(2.0f, 0.0f, 0.0f);
+		cube->name = std::string("Cube");
+	}
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
 	GUIManager guiManager(window);
 	guiManager.SetScene(&scene);
 	guiManager.AddPanel(std::make_unique<InspectorPanel>());
+	guiManager.AddPanel(std::make_unique<HierarchyPanel>());
 
+	// TODO: Move this code into a renderer class
+	// Generate UBO
+	unsigned int cameraUBO;
+	glGenBuffers(1, &cameraUBO);
+	glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
+
+	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO);
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -102,31 +133,16 @@ int main() {
 		
 		//std::cout << std::string("FPS: ") << 1 / deltaTime << std::endl;
 
-		glm::mat4 view = glm::mat4(1.0f);
-		view = camera.getViewMatrix();
-		
-		glm::mat4 projection = glm::mat4(1.0f);
-		projection = glm::perspective(glm::radians(fov), ((float)windowWidth / windowHeight), 0.1f, 100.0f);
+		glm::mat4 view = camera.getViewMatrix();
+		glm::mat4 projection = glm::perspective(glm::radians(fov), ((float)windowWidth / windowHeight), 0.1f, 100.0f);
 
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.0f));
-		model = glm::scale(model, glm::vec3(0.5f));
-
-		modelShader.use();
-		modelShader.setMat4("projection", projection);
-		modelShader.setMat4("view", view);
-
-
-		scene.drawScene();
-		//backpack.transform.position = glm::vec3(1.0f);
-		//backpack.Draw(modelShader);
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 5.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
+		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		cubeShader.use();
-		cubeShader.setVec3("objectColor", 0.2f, 0.5f, 0.0f);
+		cubeShader.setVec3("objectColor", 0.2f, 1.5f, 0.0f);
 		cubeShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 		cubeShader.setVec3("material.ambient", 0.0f, 0.5f, 0.31f);
 		cubeShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
@@ -137,23 +153,13 @@ int main() {
 		cubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 		cubeShader.setVec3("light.position", 1.0f, 2.0f, 1.0f);
 		cubeShader.setVec3("viewPos", camera.Position);
-		cubeShader.setMat4("model", model);
-		cubeShader.setMat4("view", view);
-		cubeShader.setMat4("projection", projection);
-		cube.Draw(cubeShader);
 
-		//lightShader.use();
-		//lightShader.setMat4("model", model);
-		//lightShader.setMat4("view", view);
-		//lightShader.setMat4("projection", projection);
-		//glBindVertexArray(lightVAO);
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
+		scene.drawScene();
 
 		guiManager.DrawGUI();
 
 		glfwSwapBuffers(window);
 	}
-
 	
 	glfwTerminate();
 	return 0;

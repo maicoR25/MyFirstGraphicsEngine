@@ -24,6 +24,9 @@
     <ClCompile Include="src\stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\gui\panels\hierarchy_panel.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="external\includes\imgui\backends\imgui_impl_glfw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -56,9 +59,6 @@
     <ClInclude Include="src\headers\shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="external\includes\stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\headers\camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -66,6 +66,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\headers\model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui\gui_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui\gui_panel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui\panels\inspector_panel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\headers\scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\headers\scene_object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gui\editor_context.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="external\includes\imgui\backends\imgui_impl_glfw.h">
@@ -93,21 +111,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="external\includes\imgui\imstb_truetype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\gui\gui_manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\gui\gui_panel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\gui\panels\inspector_panel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\headers\scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\headers\scene_object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

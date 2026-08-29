@@ -109,6 +109,12 @@ public:
 	void setVec3(const std::string& name, float x, float y, float z) const {
 		glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z);
 	}
+	void bindUniformBlock(const std::string& blockName, unsigned int bindingPoint) {
+		unsigned int blockIndex = glGetUniformBlockIndex(ID, blockName.c_str());
+		if (blockIndex != GL_INVALID_INDEX) {
+			glUniformBlockBinding(ID, blockIndex, bindingPoint);
+		}
+	}
 };
 
 
